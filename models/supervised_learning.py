@@ -35,3 +35,8 @@ def knn(X_train, y_train, n_neighbors=5):
     model = KNeighborsClassifier(n_neighbors=n_neighbors)
     model.fit(X_train, y_train)
     return model
+
+def gradient_boosting(X_train, y_train, n_estimators=100, learning_rate=0.1, max_depth=3):
+    model = GradientBoostingClassifier(n_estimators=n_estimators,  learning_rate=learning_rate, max_depth=max_depth)
+    model.fit(X_train, y_train)
+    return model

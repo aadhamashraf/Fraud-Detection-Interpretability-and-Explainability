@@ -1,6 +1,6 @@
 # Machine Learning Models
 
-1. supervised_learning.py
+1. **supervised_learning.py**
    1. SVM
    2. KNN
    3. Logistic Regression

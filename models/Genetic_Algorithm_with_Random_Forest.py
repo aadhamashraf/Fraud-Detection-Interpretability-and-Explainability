@@ -123,20 +123,6 @@ def visualize_metrics(y_true, y_pred, y_probs, model, feature_names):
     plt.tight_layout()
     plt.show()
 
-    f1 = f1_score(y_true, y_pred, zero_division=0)
-    acc = accuracy_score(y_true, y_pred)
-    prec = precision_score(y_true, y_pred, zero_division=0)
-    rec = recall_score(y_true, y_pred, zero_division=0)
-
-    metrics = {'Precision': prec, 'Recall': rec, 'F1-Score': f1, 'Accuracy': acc}
-    plt.figure(figsize=(12, 8))
-    plt.bar(metrics.keys(), metrics.values(), color=['green', 'orange', 'blue', 'red'])
-    plt.title('Classification Metrics')
-    plt.ylabel('Score')
-    plt.ylim(0, 1)
-    for i, value in enumerate(metrics.values()):
-        plt.text(i, value + 0.02, f'{value:.2f}', ha='center')
-    plt.show()
 
 def explain(Xte, model, fnames, selected, idx=0):
     explainer = lime.lime_tabular.LimeTabularExplainer(

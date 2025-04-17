@@ -10,6 +10,7 @@ import random
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import MinMaxScaler, OneHotEncoder
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.naive_bayes import GaussianNB
 from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
 import lime.lime_tabular
@@ -80,6 +81,16 @@ def train_rf(Xtr, Xte, ytr, yte, features, out='best_rf_model.pkl'):
     visualize_metrics(y_test, y_pred, y_probs, clf, X.columns)
     return model
 
+
+def train_nb(Xtr, Xte, ytr, yte, features):
+    model = GaussianNB()
+    model.fit(Xtr[:, features], ytr)
+    y_pred = model.predict(Xte[:, features])
+    y_probs = model.predict_proba(Xte[:, features])[:, 1]
+    visualize_metrics(yte, y_pred, y_probs, model, [f"feat_{i}" for i in features])
+    return model, features
+
+
 def visualize_metrics(y_true, y_pred, y_probs, model, feature_names):
     cm = confusion_matrix(y_true, y_pred)
     plt.figure(figsize=(6, 6))
@@ -132,10 +143,17 @@ def explain(Xte, model, fnames, selected, idx=0):
         mode='classification'
     )
     explainer.explain_instance(Xte[idx, selected], model.predict_proba).show_in_notebook()
+    explanation.show_in_notebook()
 
 def main(df, pop=10, gen=10, mrate=0.1):
     X_train_resampled, X_test, y_train_resampled, y_test, pipe = prepare_data(df)
-    pop = generate_population(pop=10, dim=X_train_resampled.shape[1])
-    best_gene = evolve(X_train_resampled, X_test, y_train_resampled, y_test, pop, gen=10, mrate=0.1)
+    
+    # Genetic Algorithm: Select features using Random Forest internally
+    pop = generate_population(pop=pop, dim=X_train_resampled.shape[1])
+    best_gene = evolve(X_train_resampled, X_test, y_train_resampled, y_test, pop, gen=gen, mrate=mrate)
     selected_features = [i for i, bit in enumerate(best_gene) if bit] # ['step', 'amount', 'oldbalanceOrg', 'newbalanceOrig', 'newbalanceDest', 'type_PAYMENT', 'type_TRANSFER']
-    train_rf(X_train_resampled, X_test, y_train_resampled, y_test, selected_features)
+    # train_rf(X_train_resampled, X_test, y_train_resampled, y_test, selected_features)
+
+    model, selected_features = train_nb(X_train_resampled, X_test, y_train_resampled, y_test, selected_features) 
+    explain(X_test, model, [f"feat_{i}" for i in range(X_test.shape[1])], selected_features, idx=0)
+

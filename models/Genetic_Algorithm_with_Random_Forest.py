@@ -10,7 +10,6 @@ import random
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import MinMaxScaler, OneHotEncoder
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import f1_score, precision_score, recall_score, accuracy_score, classification_report, confusion_matrix
 from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
 import lime.lime_tabular
@@ -18,6 +17,18 @@ from imblearn.over_sampling import SMOTE
 from joblib import Parallel, delayed
 import matplotlib.pyplot as plt
 import seaborn as sns
+
+from sklearn.metrics import (
+    classification_report,
+    confusion_matrix,
+    roc_curve,
+    roc_auc_score,
+    precision_recall_curve,
+    f1_score,
+    precision_score,
+    recall_score,
+    accuracy_score
+)
 
 def prepare_data(df):
     X = df.drop(columns=['isFraud', 'isFlaggedFraud'])
@@ -64,34 +75,66 @@ def mutate(chrom, rate):
 def train_rf(Xtr, Xte, ytr, yte, features, out='best_rf_model.pkl'):
     model = RandomForestClassifier(n_estimators=100, random_state=42, class_weight='balanced')
     model.fit(Xtr[:, features], ytr)
-    preds = model.predict(Xte[:, features])
-    print("Classification Report:")
-    print(classification_report(yte, preds, zero_division=0))
-    visualize_metrics(yte, preds)
+    y_pred = model.predict(X_test)
+    y_probs = model.predict_proba(X_test)[:, 1]
+    visualize_metrics(y_test, y_pred, y_probs, clf, X.columns)
     return model
 
-def visualize_metrics(y_true, y_pred):
+def visualize_metrics(y_true, y_pred, y_probs, model, feature_names):
     cm = confusion_matrix(y_true, y_pred)
     plt.figure(figsize=(6, 6))
-    sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', xticklabels=['Not Fraud', 'Fraud'], yticklabels=['Not Fraud', 'Fraud'])
+    sns.heatmap(cm, annot=True, fmt='d', cmap='Blues',xticklabels=['Not Fraud', 'Fraud'], yticklabels=['Not Fraud', 'Fraud'])
     plt.title('Confusion Matrix')
     plt.xlabel('Predicted')
-    plt.ylabel('True')
+    plt.ylabel('Actual')
     plt.show()
-    
-    precision = precision_score(y_true, y_pred, zero_division=0)
-    recall = recall_score(y_true, y_pred, zero_division=0)
+
+    report = classification_report(y_true, y_pred, output_dict=True)
+    report_df = pd.DataFrame(report).transpose()
+    print("Classification Report:")
+    print(report_df)
+
+    fpr, tpr, thresholds = roc_curve(y_true, y_probs)
+    roc_auc = roc_auc_score(y_true, y_probs)
+    plt.figure(figsize=(6, 4))
+    plt.plot(fpr, tpr, label=f'AUC = {roc_auc:.4f}')
+    plt.plot([0, 1], [0, 1], 'k--')
+    plt.xlabel('False Positive Rate')
+    plt.ylabel('True Positive Rate')
+    plt.title('ROC Curve')
+    plt.legend(loc='lower right')
+    plt.show()
+
+    precision, recall, _ = precision_recall_curve(y_true, y_probs)
+    plt.figure(figsize=(6, 4))
+    plt.plot(recall, precision, marker='.')
+    plt.xlabel('Recall')
+    plt.ylabel('Precision')
+    plt.title('Precision-Recall Curve')
+    plt.show()
+
+    importances = model.feature_importances_
+    feat_imp = pd.Series(importances, index=feature_names).sort_values(ascending=False)
+    plt.figure(figsize=(8, 4))
+    sns.barplot(x=feat_imp.values, y=feat_imp.index)
+    plt.title('Feature Importances')
+    plt.xlabel('Importance')
+    plt.ylabel('Feature')
+    plt.tight_layout()
+    plt.show()
+
     f1 = f1_score(y_true, y_pred, zero_division=0)
-    accuracy = accuracy_score(y_true, y_pred)
-    metrics = {'Precision': precision, 'Recall': recall, 'F1-Score': f1, 'Accuracy': accuracy}
-    metric_names = list(metrics.keys())
-    metric_values = list(metrics.values())
-    plt.figure(figsize=(8, 6))
-    plt.bar(metric_names, metric_values, color=['green', 'orange', 'blue', 'red'])
+    acc = accuracy_score(y_true, y_pred)
+    prec = precision_score(y_true, y_pred, zero_division=0)
+    rec = recall_score(y_true, y_pred, zero_division=0)
+
+    metrics = {'Precision': prec, 'Recall': rec, 'F1-Score': f1, 'Accuracy': acc}
+    plt.figure(figsize=(12, 8))
+    plt.bar(metrics.keys(), metrics.values(), color=['green', 'orange', 'blue', 'red'])
     plt.title('Classification Metrics')
     plt.ylabel('Score')
     plt.ylim(0, 1)
-    for i, value in enumerate(metric_values):
+    for i, value in enumerate(metrics.values()):
         plt.text(i, value + 0.02, f'{value:.2f}', ha='center')
     plt.show()
 

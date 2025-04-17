@@ -108,5 +108,5 @@ def main(df, pop=10, gen=10, mrate=0.1):
     X_train_resampled, X_test, y_train_resampled, y_test, pipe = prepare_data(df)
     pop = generate_population(pop=10, dim=X_train_resampled.shape[1])
     best_gene = evolve(X_train_resampled, X_test, y_train_resampled, y_test, pop, gen=10, mrate=0.1)
-    selected_features = [i for i, bit in enumerate(best_gene) if bit]
+    selected_features = [i for i, bit in enumerate(best_gene) if bit] # ['step', 'amount', 'oldbalanceOrg', 'newbalanceOrig', 'newbalanceDest', 'type_PAYMENT', 'type_TRANSFER']
     train_rf(X_train_resampled, X_test, y_train_resampled, y_test, selected_features)

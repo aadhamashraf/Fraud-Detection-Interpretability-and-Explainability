@@ -136,7 +136,7 @@ def visualize_metrics(y_true, y_pred, y_probs, model, feature_names):
     plt.show()
 
 
-def explain(Xte, model, fnames, selected, idx=0):
+def explain_lime(Xte, model, fnames, selected, idx=0):
     explainer = lime.lime_tabular.LimeTabularExplainer(
         training_data=Xte[:, selected],
         feature_names=[fnames[i] for i in selected],
@@ -156,5 +156,5 @@ def main(df, pop=10, gen=10, mrate=0.1):
     # train_rf(X_train_resampled, X_test, y_train_resampled, y_test, selected_features)
     model, selected_features = train_nb(X_train_resampled, X_test, y_train_resampled, y_test, selected_features) 
     selected_indices = [X_test.columns.get_loc(col) for col in selected_features]
-    explain(X_test, model, selected_features, selected_indices, idx=0)
+    explain_lime(X_test, model, selected_features, selected_indices, idx=0)
 

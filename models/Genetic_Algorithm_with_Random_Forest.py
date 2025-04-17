@@ -76,9 +76,9 @@ def mutate(chrom, rate):
 def train_rf(Xtr, Xte, ytr, yte, features, out='best_rf_model.pkl'):
     model = RandomForestClassifier(n_estimators=100, random_state=42, class_weight='balanced')
     model.fit(Xtr[:, features], ytr)
-    y_pred = model.predict(X_test)
-    y_probs = model.predict_proba(X_test)[:, 1]
-    visualize_metrics(y_test, y_pred, y_probs, clf, X.columns)
+    y_pred = model.predict(Xte)
+    y_probs = model.predict_proba(Xte)[:, 1]
+    visualize_metrics(yte, y_pred, y_probs, model, [f"feat_{i}" for i in features])
     return model
 
 
@@ -88,6 +88,7 @@ def train_nb(Xtr, Xte, ytr, yte, features):
     y_pred = model.predict(Xte[:, features])
     y_probs = model.predict_proba(Xte[:, features])[:, 1]
     visualize_metrics(yte, y_pred, y_probs, model, [f"feat_{i}" for i in features])
+    
     return model, features
 
 
@@ -143,8 +144,7 @@ def explain(Xte, model, fnames, selected, idx=0):
         mode='classification'
     )
     explainer.explain_instance(Xte[idx, selected], model.predict_proba).show_in_notebook()
-    explanation.show_in_notebook()
-
+  
 def main(df, pop=10, gen=10, mrate=0.1):
     X_train_resampled, X_test, y_train_resampled, y_test, pipe = prepare_data(df)
     

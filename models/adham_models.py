@@ -152,8 +152,8 @@ def main(df, pop=10, gen=10, mrate=0.1):
     pop = generate_population(pop=pop, dim=X_train_resampled.shape[1])
     best_gene = evolve(X_train_resampled, X_test, y_train_resampled, y_test, pop, gen=gen, mrate=mrate)
     selected_features = [i for i, bit in enumerate(best_gene) if bit] # ['step', 'amount', 'oldbalanceOrg', 'newbalanceOrig', 'newbalanceDest', 'type_PAYMENT', 'type_TRANSFER']
+    
     # train_rf(X_train_resampled, X_test, y_train_resampled, y_test, selected_features)
-
     model, selected_features = train_nb(X_train_resampled, X_test, y_train_resampled, y_test, selected_features) 
     selected_indices = [X_test.columns.get_loc(col) for col in selected_features]
     explain(X_test, model, selected_features, selected_indices, idx=0)

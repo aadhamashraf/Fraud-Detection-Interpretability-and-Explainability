@@ -32,7 +32,7 @@ from sklearn.metrics import (
     accuracy_score
 )
 
-def prepare_data(df):
+def prepare_data(df): 
     X = df.drop(columns=['isFraud', 'isFlaggedFraud'])
     y = df['isFraud']
     pipe = ColumnTransformer([
@@ -125,17 +125,6 @@ def visualize_metrics(y_true, y_pred, y_probs, model, feature_names):
     plt.ylabel('Precision')
     plt.title('Precision-Recall Curve')
     plt.show()
-
-    importances = model.feature_importances_
-    feat_imp = pd.Series(importances, index=feature_names).sort_values(ascending=False)
-    plt.figure(figsize=(8, 4))
-    sns.barplot(x=feat_imp.values, y=feat_imp.index)
-    plt.title('Feature Importances')
-    plt.xlabel('Importance')
-    plt.ylabel('Feature')
-    plt.tight_layout()
-    plt.show()
-
 
 def explain_lime(Xte, model, fnames, selected, idx=0):
     explainer = lime.lime_tabular.LimeTabularExplainer(

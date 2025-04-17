@@ -156,5 +156,5 @@ def main(df, pop=10, gen=10, mrate=0.1):
 
     model, selected_features = train_nb(X_train_resampled, X_test, y_train_resampled, y_test, selected_features) 
     selected_indices = [X_test.columns.get_loc(col) for col in selected_features]
-    explain(X_test, model, [f"feat_{i}" for i in range(X_test.shape[1])], selected_indices, idx=0)
+    explain(X_test, model, selected_features, selected_indices, idx=0)
 

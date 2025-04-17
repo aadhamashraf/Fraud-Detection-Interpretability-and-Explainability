@@ -13,6 +13,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.naive_bayes import GaussianNB
 from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
+from sklearn.inspection import PartialDependenceDisplay , permutation_importance
 import lime.lime_tabular
 from imblearn.over_sampling import SMOTE
 from joblib import Parallel, delayed
@@ -144,9 +145,37 @@ def explain_lime(Xte, model, fnames, selected, idx=0):
         mode='classification'
     )
     explainer.explain_instance(Xte[idx, selected], model.predict_proba).show_in_notebook()
-  
+
+def explain_pdp_ice(model, X_test, selected, feature_names, pipe):
+    selected_features = [feature_names[i] for i in selected]    
+    fig, ax = plt.subplots(nrows=len(selected_features), figsize=(8, 3 * len(selected_features)))
+    for i, feat_idx in enumerate(selected):
+        PartialDependenceDisplay.from_estimator(
+            model, 
+            X_test[:, selected], 
+            [i],  
+            feature_names=selected_features,
+            kind='both',  
+            ax=ax[i] if len(selected_features) > 1 else ax
+        )
+    plt.tight_layout()
+    plt.show()
+
+def explain_permutation_importance(model, X_test, y_test, selected, feature_names):
+    result = permutation_importance(model, X_test[:, selected], y_test, n_repeats=10, random_state=42, n_jobs=-1)
+    sorted_idx = result.importances_mean.argsort()[::-1]
+    sorted_feats = [feature_names[selected[i]] for i in sorted_idx]
+    plt.figure(figsize=(8, 4))
+    sns.barplot(x=result.importances_mean[sorted_idx], y=sorted_feats)
+    plt.title('Permutation Feature Importance')
+    plt.xlabel('Mean Importance Decrease')
+    plt.ylabel('Feature')
+    plt.tight_layout()
+    plt.show()
+
 def main(df, pop=10, gen=10, mrate=0.1):
     X_train_resampled, X_test, y_train_resampled, y_test, pipe = prepare_data(df)
+    feat_names = pipe.get_feature_names_out()
     
     # Genetic Algorithm: Select features using Random Forest internally
     pop = generate_population(pop=pop, dim=X_train_resampled.shape[1])
@@ -156,5 +185,8 @@ def main(df, pop=10, gen=10, mrate=0.1):
     # train_rf(X_train_resampled, X_test, y_train_resampled, y_test, selected_features)
     model, selected_features = train_nb(X_train_resampled, X_test, y_train_resampled, y_test, selected_features) 
     selected_indices = [X_test.columns.get_loc(col) for col in selected_features]
-    explain_lime(X_test, model, selected_features, selected_indices, idx=0)
 
+    ## **Explainability  Section**
+    explain_lime(X_test, model, selected_features, selected_indices, idx=0)
+    explain_pdp_ice(model, X_test, selected_features, feat_names, pipe)
+    explain_permutation_importance(model, X_test, y_test, selected_features, feat_names)

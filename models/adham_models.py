@@ -163,7 +163,7 @@ def explain_pdp_ice(model, X_test, selected, feature_names, pipe):
 
 def explain_permutation_importance(model, X_test, y_test, selected, feature_names):
     result = permutation_importance(model, X_test[:, selected], y_test, n_repeats=10, random_state=42, n_jobs=-1)
-    sorted_idx = result.importances_mean.argsort()[::-1]
+    sorted_idx = result.importances_mean.argsort()
     sorted_feats = [feature_names[selected[i]] for i in sorted_idx]
     plt.figure(figsize=(8, 4))
     sns.barplot(x=result.importances_mean[sorted_idx], y=sorted_feats)

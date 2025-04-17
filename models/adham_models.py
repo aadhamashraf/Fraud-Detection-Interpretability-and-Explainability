@@ -85,11 +85,10 @@ def train_rf(Xtr, Xte, ytr, yte, features, out='best_rf_model.pkl'):
 
 def train_nb(Xtr, Xte, ytr, yte, features):
     model = GaussianNB()
-    model.fit(Xtr[:, features], ytr)
-    y_pred = model.predict(Xte[:, features])
-    y_probs = model.predict_proba(Xte[:, features])[:, 1]
-    visualize_metrics(yte, y_pred, y_probs, model, [f"feat_{i}" for i in features])
-    
+    model.fit(Xtr[features], ytr)
+    y_pred = model.predict(Xte[features])
+    y_probs = model.predict_proba(Xte[features])[:, 1]
+    visualize_metrics(yte, y_pred, y_probs, model, features)
     return model, features
 
 

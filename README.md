@@ -1,48 +1,18 @@
-# Fraud Detection Models Comparitive Analysis
+# Fraud detection in financial transactions using explainable ML & DL models 
 
-This repository contains an exploratory data analysis notebook and a collection of machine learning models tested for performance benchmarking and comparison.
+This repository contains the final project for the DSAI 305 course at Zewail City, focusing on explainable AI models for financial transaction fraud detection. The `final_models/` directory includes Jupyter notebooks, each implementing a machine learning or deep learning model with explainability techniques.
 
-## Repository Structure
+## Instructions
+1. **Open Notebooks**:
+   - Navigate to the `final_models/` directory.
+   - Open each Jupyter notebook and preferably, use GPU powered environment in a Jupyter environment (e.g., JupyterLab, Google Colab).
 
-```
-.
-├── EDA.ipynb                         # Exploratory Data Analysis notebook
-└── final_models/
-    ├── 1 - Logistic Regression + GA.ipynb
-    ├── 2 - Naïve Bayes.ipynb
-    ├── 3 - Isolation Forest with Experimental Scenarios.ipynb
-    ├── 4 - Xgboost.ipynb
-    ├── 5 - Random Forest Classifier + SMOTE ENN.ipynb
-    ├── 6_Artificial_Neural_Network.ipynb
-    ├── 7 - CNN.ipynb
-    ├── 8-LightGBM.ipynb
-    ├── 9 - XGBOD.ipynb
-    ├── 10 - Hybrid Classifier(Logistic_Regression,_Decision_Tree,_Random_Forest).ipynb
-    └── 11 - SVM.ipynb
-    └── 12 - RUS + XGBoost.ipynb
-```
+2. **Run All Cells**:
+   - Execute cells sequentially, as data, imports and dependencies are defined at the top.
+   - Each notebook covers data preprocessing, model training, evaluation, and explainability, so review the Table of Contents.
 
-## How to Run
 
-1. **Clone the Repository**
-
-   ```bash
-   git clone https://github.com/aadhamashraf/Fraud-Detection-Interpretability-and-Explainability.git
-   cd Fraud-Detection-Interpretability-and-Explainability
-   ```
-
-2. **Launch Jupyter Notebook**
-
-   ```bash
-   jupyter notebook
-   ```
-
-3. **Notebook Execution Order**
-
-   * Start with `EDA.ipynb` for data understanding.
-   * Navigate to the `final_models` folder to explore and run individual model notebooks:
-
-     * Classical models (e.g., Logistic Regression, Naïve Bayes)
-     * Ensemble models (e.g., XGBoost, LightGBM, Random Forest)
-     * Deep learning models (ANN, CNN)
-     * Hybrid and experimental approaches (e.g., XGBOD, Hybrid Classifier, Isolation Forest)
+## Notes
+- Ensure dependencies (`pandas`, `numpy`, `scikit-learn`, `imblearn`, `lightgbm`, `tensorflow`, `shap`, `lime`) are installed via `pip`.
+- Datasets are loaded within notebooks (e.g., PaySim via `kagglehub`). (Imported automatically in each notebook).
+- For resource-intensive explainability sections (e.g., SHAP, LIME), adjust sample sizes if needed.

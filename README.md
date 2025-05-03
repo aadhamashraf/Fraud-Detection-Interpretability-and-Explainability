@@ -5,7 +5,7 @@ This repository contains the final project for the DSAI 305 course at Zewail Cit
 ## Instructions
 1. **Open Notebooks**:
    - Navigate to the `final_models/` directory.
-   - Open each Jupyter notebook (e.g., `LightGBM_Model.ipynb`, `CNN_Model.ipynb`) in a Jupyter environment (e.g., JupyterLab, Google Colab).
+   - Open each Jupyter notebook and preferably, use GPU powered environment in a Jupyter environment (e.g., JupyterLab, Google Colab).
 
 2. **Run All Cells**:
    - Execute cells sequentially, as data, imports and dependencies are defined at the top.
